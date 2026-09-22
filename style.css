@@ -220,7 +220,7 @@ textarea { min-height: 90px; font-family: ui-monospace, monospace; font-size: 13
 /* ===== 윤이 블록: 미션·블록판·무대 (CREQ-52·54·56) ===== */
 .friend { display: inline-flex; align-items: center; white-space: nowrap; width: auto; min-width: 52px; height: 44px; border-radius: 999px; padding: 0 12px 0 6px; gap: 4px; font-size: 16px; }
 .friend .fimg { font-size: 26px; }
-.friend.lg { height: 56px; font-size: 20px; }
+.friend.lg { width: auto; height: 56px; font-size: 20px; padding: 0 16px 0 8px; }
 .friend.lg .fimg { font-size: 34px; }
 .chip { display: inline-block; background: var(--card); border-radius: 999px; padding: 6px 12px; font-weight: 800; font-size: var(--fs-sm); box-shadow: var(--shadow); margin: 2px; }
 .chip.off { opacity: .35; }
