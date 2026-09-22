@@ -9,11 +9,11 @@ window.CONTENT = (() => {
     { id: 'cat', name: '냐옹', img: '🐱', color: '#ffb300' },
     { id: 'fish', name: '물고기', img: '🐠', color: '#26c6da' },
   ];
-  /* ---------- 등장인물 (공통 06: 은후는 나오지 않아요) ---------- */
+  /* ---------- 등장인물 (공통 06: 은후는 나오지 않아요). call = 윤이를 부르는 호칭 (현이·초록이는 남동생 → 형, 미소는 여동생 → 오빠) ---------- */
   const friends = {
-    hyun: { name: '현이', img: '👦', color: '#42a5f5', role: '동생' },
-    chorok: { name: '초록이', img: '🧒', color: '#66bb6a', role: '친척동생' },
-    miso: { name: '미소', img: '👧', color: '#ff8a80', role: '친척동생' },
+    hyun: { name: '현이', img: '👦', color: '#42a5f5', role: '남동생', call: '형' },
+    chorok: { name: '초록이', img: '👦', color: '#66bb6a', role: '친척 남동생', call: '형' },
+    miso: { name: '미소', img: '👧', color: '#ff8a80', role: '친척 여동생', call: '오빠' },
     imo: { name: '이모', img: '👩', color: '#ab47bc', role: '어른' },
     samchon: { name: '삼촌', img: '🧔', color: '#8d6e63', role: '어른' },
   };
@@ -55,7 +55,7 @@ window.CONTENT = (() => {
     title: '우리 집 마당', bg: '🏡', theme: 'linear-gradient(#bde0fe,#e9f5db)', thing: '빨래 널기', sticker: '🧺', props: ['🧦', '👕', '🧺', '🌳', '🐶'],
     days: [
       { unlock: ['flag', 'right'], sticker: '🧦', m: [
-        { name: '양말을 널자', say: '{F}: 누나, 양말이 저기 있어! 빨랫줄까지 가 줘.', f: 'hyun', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🧦' }, sol: ['right:3'] },
+        { name: '양말을 널자', say: '{F}: 형, 양말이 저기 있어! 빨랫줄까지 가 줘.', f: 'hyun', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🧦' }, sol: ['right:3'] },
         { name: '현이가 놓은 블록 고치기', say: '{F}: 내가 만들었는데 안 가… 뭐가 틀렸지?', f: 'hyun', map: ['........', '........', 'S...a...', '........', '........'], legend: { a: '👕' }, sol: ['right:4'], given: ['right:2'] },
       ] },
       { unlock: ['left'], sticker: '👕', m: [
@@ -64,7 +64,7 @@ window.CONTENT = (() => {
       ] },
       { unlock: [], sticker: '🩳', m: [
         { name: '두 개를 한 번에', say: '{F}: 가는 길에 있는 빨래를 다 걷어 줘!', f: 'imo', map: ['........', '........', 'S.a..b..', '........', '........'], legend: { a: '🧦', b: '🧦' }, sol: ['right:5'] },
-        { name: '미소 블록 고치기', say: '{F}: 언니, 이거 왜 반대로 가?', f: 'miso', map: ['........', '........', 'a..S....', '........', '........'], legend: { a: '👕' }, sol: ['left:3'], given: ['right:3'] },
+        { name: '미소 블록 고치기', say: '{F}: 오빠, 이거 왜 반대로 가?', f: 'miso', map: ['........', '........', 'a..S....', '........', '........'], legend: { a: '👕' }, sol: ['left:3'], given: ['right:3'] },
       ] },
       { unlock: [], sticker: '🧣', m: [
         { name: '양쪽 빨래', say: '{F}: 오른쪽 먼저, 그다음 왼쪽!', f: 'samchon', map: ['........', '........', '.b.S.a..', '........', '........'], legend: { a: '🧣', b: '🧤' }, sol: ['right:2', 'left:4'] },
@@ -171,7 +171,7 @@ window.CONTENT = (() => {
         { name: '초록이 블록 고치기', say: '{F}: 팻말을 먼저 박았더니 텐트가 무너졌어…', f: 'chorok', map: ['..c.....', '........', 'S.a.....', '........', '..b.....'], legend: { a: '🥢', b: '🟦', c: '📌' }, order: ['a', 'b', 'c'], sol: ['right:2', 'down:2', 'up:4'], given: ['right:2', 'up:2', 'down:4'] },
       ] },
       { unlock: [], sticker: '⛺', m: [
-        { name: '텐트 완성!', say: '{F}: 나를 톡 해서 팻말을 가져다줘. 누나는 폴대와 천!', f: 'miso', map: ['S.a.....', '........', '....b...', '........', 'M....c..'], legend: { a: '🥢', b: '🟦', c: '📌' }, order: ['a', 'b', 'c'], chars: [{ id: 'lead', at: 'S', sol: ['right:2', 'down:2', 'right:2'] }, { id: 'miso', at: 'M', hat: 'tap', sol: ['tap', 'right:5'] }], sol: ['right:2', 'down:2', 'right:2'] },
+        { name: '텐트 완성!', say: '{F}: 나를 톡 해서 팻말을 가져다줘. 오빠는 폴대와 천!', f: 'miso', map: ['S.a.....', '........', '....b...', '........', 'M....c..'], legend: { a: '🥢', b: '🟦', c: '📌' }, order: ['a', 'b', 'c'], chars: [{ id: 'lead', at: 'S', sol: ['right:2', 'down:2', 'right:2'] }, { id: 'miso', at: 'M', hat: 'tap', sol: ['tap', 'right:5'] }], sol: ['right:2', 'down:2', 'right:2'] },
         { name: '미소 블록 고치기', say: '{F}: 팻말까지 조금 모자라!', f: 'miso', map: ['S.a.....', '........', '....b...', '........', 'M....c..'], legend: { a: '🥢', b: '🟦', c: '📌' }, order: ['a', 'b', 'c'], chars: [{ id: 'lead', at: 'S', sol: ['right:2', 'down:2', 'right:2'], given: ['right:2', 'down:2', 'right:2'] }, { id: 'miso', at: 'M', hat: 'tap', sol: ['tap', 'right:5'], given: ['tap', 'right:3'] }], sol: ['right:2', 'down:2', 'right:2'] },
       ] },
     ],
