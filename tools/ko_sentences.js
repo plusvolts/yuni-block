@@ -14,7 +14,8 @@ const names = C.leaders.map(l => l.name); const child = '윤이';
   '작품을 저장했어! 별 두 개!', '작품을 저장했어!', '마지막은 자유 만들기! 친구랑 소품을 넣고 마음대로 만들어 봐. 다 만들면 저장 버튼!',
   '이 미션을 끝내면 받을 수 있어', '블록을 끌어다 붙이고 실행을 눌러 봐! 오늘 블록 놀이 끝! 정말 잘했어, 윤이.',
   '오늘은 첫날! 복습 없이 바로 새 블록으로 가요', '오늘은 새 블록 없이 연습하는 날! 바로 미션으로 가요',
-  '순서가 달라! 순서를 잘 봐.', '친구는 톡 해서 움직여야 해.'].forEach(add);
+  '순서가 달라! 순서를 잘 봐.', '친구는 톡 해서 움직여야 해.', '흰 자리를 보고 놓아 봐', '이제 똑같이 놓아 봐!'].forEach(add);
+for (const n of [2, 3, 4, 5]) { add(`이제 똑같이 놓아 봐! 블록을 놓고 숫자를 눌러 ${n}로 바꿔.`); add(`블록은 맞아! 블록의 숫자를 눌러서 ${n}로 바꿔 봐`); }
 C.lines.praise.forEach(add); C.lines.retry.forEach(add);
 ['인사', '복습 미션', '새 블록', '미션', '자유 만들기'].forEach(n => add(`다음은 ${n}!`));
 add(`안녕, ${child}! 오늘도 블록으로 놀자!`);
@@ -28,7 +29,7 @@ C.units.forEach((u, ui) => {
   for (const p of C.lines.praise) add(`${p} ${u.thing}에 한 걸음 더!`);
   for (const lv of ['']) add(`오늘 블록 놀이 끝! 정말 잘했어, ${child}. 스티커도 받았어! ${u.thing} 완성!`);
   add(`오늘 블록 놀이 끝! 정말 잘했어, ${child}. 스티커도 받았어! 내일 또 만나!`);
-  for (let lv = 1; lv <= 22; lv++) { add(`오늘 블록 놀이 끝! 정말 잘했어, ${child}. 레벨 ${lv}이 됐어! 스티커도 받았어! 내일 또 만나!`); add(`오늘 블록 놀이 끝! 정말 잘했어, ${child}. 레벨 ${lv}이 됐어! 스티커도 받았어! ${u.thing} 완성!`); }
+  for (let lv = 1; lv <= 22; lv++) { const j = [2, 4, 5, 9].includes(lv % 10) ? '가' : '이'; add(`레벨 ${lv}${j} 됐어!`); }
   for (const day of u.days) for (const m of day.m) { for (const n of names) add(m.say.replace('{F}', m.f ? C.friends[m.f].name : n)); }
   Object.values(C.friends).forEach(f => add(`${f.name}를 톡 해 봐!`));
 });

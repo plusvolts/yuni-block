@@ -1,7 +1,7 @@
 /* 윤이 블록 — 앱 로직 (의존성 없음). 영어 앱 v1.3.3 뼈대 + 세 앱 공통 코드(아빠 화면·별·한국어 녹음) */
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.3';
+  const APP_VERSION = '1.0.4';
   const C = window.CONTENT; const BK = window.BLOCKS; const B = C.blocks;
   const U = C.units;
   const DAYS = 5;
@@ -176,6 +176,7 @@
     return out;
   }
   const level = () => Object.keys(S.learned).length;
+  const lvJosa = n => ([2, 4, 5, 9].includes(n % 10) || (n % 10 === 0 && n === 0) ? '가' : '이'); // 레벨 2가 / 레벨 3이
 
   /* ================= 홈 ================= */
   let installEvt = null;
@@ -632,7 +633,7 @@
       <div class="bubble">오늘 블록 놀이 끝! 정말 잘했어, ${esc(childName())}!<small>내일 또 만나요 👋</small></div>
       <div class="big-stars">⭐ +${L.earned}</div>
       ${bonus ? `<div class="muted" style="font-weight:800;margin-top:-10px">끝까지 한 보너스 ⭐${bonus} 포함</div>` : ''}
-      ${lvUp ? `<div class="sticker-new">🏅</div><div class="bubble">레벨 ${level()}이 됐어요!<small>배운 블록 ${level()}개</small></div>` : ''}
+      ${lvUp ? `<div class="sticker-new">🏅</div><div class="bubble">레벨 ${level()}${lvJosa(level())} 됐어요!<small>배운 블록 ${level()}개</small></div>` : ''}
       <div class="sticker-new">${S.stickers[dk].img}</div><div class="bubble">${esc(up.title)} ${d}일차 스티커를 받았어요!</div>
       ${unitSticker ? `<div class="sticker-new">${up.sticker}</div><div class="bubble">${esc(up.thing)} 완성! 단원 스티커도 받았어요 🏆</div>` : ''}
       <div class="home-links">
@@ -642,7 +643,7 @@
       </div>
     </div></div>`, { home: homeScreen, stickers: () => stickerScreen(u), works: worksScreen });
     confetti(); tone([523, 659, 784, 1046], 0.16);
-    ko(`오늘 블록 놀이 끝! 정말 잘했어, ${childName()}. ${lvUp ? `레벨 ${level()}이 됐어!` : ''} 스티커도 받았어! ${unitSticker ? `${up.thing} 완성!` : '내일 또 만나!'}`);
+    ko(`오늘 블록 놀이 끝! 정말 잘했어, ${childName()}. ${lvUp ? `레벨 ${level()}${lvJosa(level())} 됐어!` : ''} 스티커도 받았어! ${unitSticker ? `${up.thing} 완성!` : '내일 또 만나!'}`);
   }
 
   /* ================= 아빠 화면 공통: 암호(61)·통계(62)·탭(63) — 세 앱 같은 코드 (plan/0_COMMON_spec.md 5-1) ================= */

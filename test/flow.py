@@ -7,6 +7,9 @@ MOCK = r"""
 window.speechSynthesis.speak = function(u){ window.__said=(window.__said||[]); window.__said.push(u.text); setTimeout(()=>u.onend&&u.onend(), 5); };
 window.speechSynthesis.cancel = function(){};
 window.__KO_LOG = [];
+// 공통 65: 한국어 녹음은 실제로 요청하되 빨리 끝내기 (테스트 시간 줄이기)
+const _play = HTMLMediaElement.prototype.play;
+HTMLMediaElement.prototype.play = function(){ const p = _play.call(this); if (/audio-ko\//.test(this.src)) { const a = this; const end = () => setTimeout(()=>{ try{ a.pause(); }catch(e){} a.dispatchEvent(new Event('ended')); }, 60); if (a.readyState >= 4) end(); else { a.addEventListener('canplaythrough', end, {once:true}); a.addEventListener('error', end, {once:true}); setTimeout(end, 800); } } return p; };
 if(!localStorage.getItem("yuni-block-v1")) localStorage.setItem("yuni-block-v1", JSON.stringify({settings:{}}));
 """
 
@@ -127,7 +130,14 @@ async def run(name, vw, vh, mobile):
         REQ['공통 64 새 블록: 틀리면 0, 다시 맞히면 별 1, 땡 없음'] = T64.get('learn') is True
         REQ['공통 64 고치기 미션: 3번 실패 뒤 정답·다음▶, 넘어가면 0, 이전으로 맞혀도 0'] = T64.get('fix') is True
         REQ['CREQ-54 미션 정답이면 별 1'] = T64.get('mission') is True
-        REQ['CREQ-65 ko() 문장 수집'] = await pg.evaluate("window.__KO_LOG.length>0")
+        # 공통 65: 하루 흐름에서 ko()가 읽은 문장이 녹음 목록(audio-ko/index.json)에 얼마나 있는지 (문장 . ! ? 단위, app.js ko()와 같은 규칙)
+        cov = await pg.evaluate("""fetch('audio-ko/index.json').then(r=>r.json()).then(idx=>{ const key=t=>String(t).replace(/\\s+/g,' ').trim();
+          const sen=t=>String(t).split(/(?<=[.!?])\\s+/).map(x=>x.trim()).filter(Boolean); const all=new Set(), miss=new Set();
+          for (const t of window.__KO_LOG) { const parts = idx[key(t)] ? [t] : sen(t); for (const p of parts) { all.add(key(p)); if (!idx[key(p)]) miss.add(key(p)); } }
+          return {n:all.size, miss:[...miss], files:Object.keys(idx).length}; })""")
+        pct = 100 * (cov['n'] - len(cov['miss'])) / max(1, cov['n'])
+        print(f" 65 한국어 녹음: 읽은 문장 {cov['n']}개 중 녹음 있음 {pct:.1f}% (녹음 목록 {cov['files']}개), 빠진 문장:", cov['miss'])
+        REQ['공통 65 읽은 한국어 문장 95% 이상 녹음'] = cov['n'] > 0 and pct >= 95
         # ---- 미션 60개 정답 예시 자동 풀이 (진도 코드로 각 일차 미션 단계 진입) ----
         fails = []
         for u in range(6):
