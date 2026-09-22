@@ -1,7 +1,7 @@
 /* 윤이 블록 — 앱 로직 (의존성 없음). 영어 앱 v1.3.3 뼈대 + 세 앱 공통 코드(아빠 화면·별·한국어 녹음) */
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.1';
+  const APP_VERSION = '1.0.2';
   const C = window.CONTENT; const BK = window.BLOCKS; const B = C.blocks;
   const U = C.units;
   const DAYS = 5;
@@ -439,7 +439,7 @@
           <div class="row" style="justify-content:center;gap:10px"><button class="btn small" data-act="demo">▶ 보여줘</button><button class="btn small" data-act="say">🔊 설명 듣기</button></div>
         </div>
         <div class="mcol">
-          <div class="bubble sm">똑같이 놓아 봐! <span class="muted">(정답: ${target.map(n => n.t === 'flag' ? '🚩' : B[n.t].icon + (n.n ? n.n : '')).join(' ')})</span></div>
+          <div class="bubble sm">똑같이 놓아 봐! <span class="muted">(정답: ${target.map(n => n.t === 'flag' ? '🚩' : B[n.t].icon + (n.n ? n.n : '')).join(' ')})</span>${target.some(n => n.n > 1) ? `<small>블록을 놓고 <b>숫자 1</b>을 눌러 ${target.find(n => n.n > 1).n}로 바꿔요. 1칸 블록을 ${target.find(n => n.n > 1).n}개 이어 붙여도 돼요.</small>` : ''}</div>
           <div class="ws" id="ws"></div>
           <div class="row" style="justify-content:center;gap:10px"><button class="btn primary" data-act="run">▶ 실행</button><div class="hint" id="hint"></div></div>
         </div>
@@ -457,7 +457,9 @@
           await ko(`${praise()} ${d.name} 블록을 배웠어!`); if (my === actToken) nextAct();
         } else {
           fails++; boop(); markWeak([t], 1);
-          if (fails === 1) { ws.highlight(t); setHint(`${d.icon} 블록을 끌어와요`); await ko(`${d.name} 블록을 찾아서 끌어와 봐`); }
+          const onlyNum = BK.toStr(BK.normalize(BK.clone(prog)).map(n => ({ ...n, n: undefined }))) === BK.toStr(target.map(n => ({ ...n, n: undefined })));
+          if (onlyNum) { const want = target.find(n => n.n > 1); setHint(`숫자를 눌러 ${want ? want.n : 1}(으)로 바꿔요`); ws.showGhost(target); await ko(`블록은 맞아! 블록의 숫자를 눌러서 ${want ? want.n : 1}로 바꿔 봐`); if (fails >= 3) revealNext(() => { award(false); nextAct(); }); }
+          else if (fails === 1) { ws.highlight(t); setHint(`${d.icon} 블록을 끌어와요`); await ko(`${d.name} 블록을 찾아서 끌어와 봐`); }
           else { ws.showGhost(target); setHint('흰 자리와 똑같이 놓아요'); await ko('흰 자리를 보고 똑같이 놓아 봐'); if (fails >= 3) revealNext(() => { award(false); nextAct(); }); }
         }
       },
@@ -466,7 +468,7 @@
     ws = BK.Workspace(document.getElementById('ws'), { palette: palette, prog: isHat ? [] : BK.parseProg(['flag']), lockHat: !isHat, onSpeak: speakBlock });
     L.setProg = (id, arr) => ws.set(BK.parseProg(arr)); L.target = demoProg; // 테스트용
     const my = actToken;
-    (async () => { await ko(`새 블록이야! ${d.name}. ${d.d}`); if (my !== actToken) return; stage.reset(); await stage.run({ lead: target }, isHat ? t : 'flag'); if (my !== actToken) return; await ko('이제 똑같이 놓아 봐!'); })();
+    (async () => { await ko(`새 블록이야! ${d.name}. ${d.d}`); if (my !== actToken) return; stage.reset(); await stage.run({ lead: target }, isHat ? t : 'flag'); if (my !== actToken) return; await ko(target.some(n => n.n > 1) ? `이제 똑같이 놓아 봐! 블록을 놓고 숫자를 눌러 ${target.find(n => n.n > 1).n}로 바꿔.` : '이제 똑같이 놓아 봐!'); })();
   }
   function setHint(t) { const h = document.getElementById('hint'); if (h) h.textContent = t; }
   function speakBlock(t) { hush(); ko(`${B[t].name}. ${B[t].d}`); }

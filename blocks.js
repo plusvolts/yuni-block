@@ -27,7 +27,8 @@ window.BLOCKS = (() => {
   const hatOf = nodes => (nodes[0] && isHat(nodes[0].t) ? nodes[0].t : null);
   const bodyOf = nodes => (hatOf(nodes) ? nodes.slice(1) : nodes);
   // 두 프로그램이 같은가 (따라 놓기 판정)
-  const same = (a, b) => toStr(a) === toStr(b);
+  const normalize = nodes => { const out = []; for (const n of nodes) { const p = out[out.length - 1]; if (p && p.t === n.t && n.n && !n.body && ['right', 'left', 'up', 'down', 'wait'].includes(n.t)) p.n += n.n; else out.push({ ...n, body: n.body ? normalize(n.body) : undefined }); } return out.map(n => { if (n.body === undefined) delete n.body; return n; }); };
+  const same = (a, b) => toStr(normalize(clone(a))) === toStr(normalize(clone(b)));
 
   /* ---------- 블록 그리기 ---------- */
   const SAY_EMO = ['💬', '🎉', '❤️', '😊', '⭐', '🔥', '👋', '🍎'];
@@ -100,17 +101,17 @@ window.BLOCKS = (() => {
       }
       const g = dragging.ghost; g.style.left = e.clientX + 'px'; g.style.top = e.clientY + 'px';
       root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over'));
-      const tgt = dropTarget(e.clientX, e.clientY); if (tgt) tgt.row.classList.add('over');
+      const tgt = dropTarget(e.clientX, e.clientY, dragging); if (tgt && tgt.row) tgt.row.classList.add('over');
     });
-    function dropTarget(x, y) {
-      const g = dragging.ghost; g.style.display = 'none';
+    function dropTarget(x, y, d) {
+      const g = d.ghost; if (!g) return null; g.style.display = 'none';
       const el = document.elementFromPoint(x, y); g.style.display = '';
       if (!el || !root.contains(el)) return null;
       if (el.closest('.palette')) return { del: true };
       let row = el.closest('.prog-row');
       if (!row) { if (el.closest('.prog-wrap')) row = root.querySelector('.prog-row.main'); else return null; }
       // C 블록 안에 C 블록은 넣지 않아요 (초1용 단순화)
-      if (row.classList.contains('c-body') && dragging.node && dragging.node.body) row = root.querySelector('.prog-row.main');
+      if (row.classList.contains('c-body') && d.node && d.node.body) row = root.querySelector('.prog-row.main');
       const kids = [...row.children].filter(k => k.matches('[data-path]'));
       let idx = kids.length;
       for (let i = 0; i < kids.length; i++) { const r = kids[i].getBoundingClientRect(); if (x < r.left + r.width / 2) { idx = i; break; } }
@@ -122,7 +123,8 @@ window.BLOCKS = (() => {
       const d = dragging; dragging = null;
       root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over'));
       if (!d.moved) return;
-      const tgt = dropTarget(e.clientX, e.clientY); if (d.ghost) d.ghost.remove();
+      let tgt = null; try { tgt = dropTarget(e.clientX, e.clientY, d); } catch (x) { tgt = null; }
+      if (d.ghost) d.ghost.remove(); document.querySelectorAll('.drag-ghost').forEach(x => x.remove());
       if (tgt && !tgt.del) {
         let list = listAt(ws.prog, tgt.bodyPath); let idx = tgt.idx;
         if (isHat(d.node.t)) { // 시작 블록은 맨 앞에만, 하나만
@@ -254,5 +256,5 @@ window.BLOCKS = (() => {
     return out.sort((a, b) => order.indexOf(B[a].cat) - order.indexOf(B[b].cat) || Object.keys(B).indexOf(a) - Object.keys(B).indexOf(b));
   }
 
-  return { parse, parseProg, toStr, clone, countBlocks, typesIn, isHat, hatOf, bodyOf, same, blockHtml, palHtml, Workspace, Stage, judge, paletteFor, SAY_EMO };
+  return { parse, parseProg, toStr, clone, normalize, countBlocks, typesIn, isHat, hatOf, bodyOf, same, blockHtml, palHtml, Workspace, Stage, judge, paletteFor, SAY_EMO };
 })();

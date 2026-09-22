@@ -69,6 +69,23 @@ async def run(name, vw, vh, mobile):
                     REQ['공통 17 이전 버튼'] = back.startswith('["greet"') or back.startswith('["msg"')
                     await pg.click('[data-act=next]'); await pg.wait_for_timeout(300); continue
                 k = await cur(); s0 = await stars()
+                if 'drag' not in REQ:
+                    # CREQ-52 실제 끌어다 붙이기: 팔레트 블록을 코딩판으로 끌어 놓고, 다시 팔레트로 끌어 지우기
+                    n0 = await pg.evaluate("YUNI.ws.get().length")
+                    src = await pg.locator('[data-pal]').last.bounding_box(); dst = await pg.locator('.prog-row.main').bounding_box()
+                    await pg.mouse.move(src['x'] + src['width'] / 2, src['y'] + src['height'] / 2); await pg.mouse.down()
+                    for i in range(1, 11): await pg.mouse.move(src['x'] + (dst['x'] + dst['width'] - 40 - src['x']) * i / 10, src['y'] + (dst['y'] + dst['height'] / 2 - src['y']) * i / 10)
+                    await pg.mouse.up(); await pg.wait_for_timeout(200)
+                    n1 = await pg.evaluate("YUNI.ws.get().length"); ghosts = await pg.locator('.drag-ghost').count()
+                    blk = await pg.locator('.prog-row.main [data-path]').last.bounding_box(); pal = await pg.locator('.palette').bounding_box()
+                    await pg.mouse.move(blk['x'] + blk['width'] / 2, blk['y'] + blk['height'] / 2); await pg.mouse.down()
+                    for i in range(1, 11): await pg.mouse.move(blk['x'] + (pal['x'] + 30 - blk['x']) * i / 10, blk['y'] + (pal['y'] + pal['height'] / 2 - blk['y']) * i / 10)
+                    await pg.mouse.up(); await pg.wait_for_timeout(200)
+                    n2 = await pg.evaluate("YUNI.ws.get().length"); ghosts2 = await pg.locator('.drag-ghost').count()
+                    print(' drag: prog', n0, '->', n1, '-> delete', n2, ' ghosts', ghosts, ghosts2)
+                    REQ['CREQ-52 끌어다 붙이기·팔레트로 끌어 삭제, 남는 유령 없음'] = n1 == n0 + 1 and n2 == n0 and ghosts == 0 and ghosts2 == 0
+                    # 1칸 블록 두 개 = 2칸 (따라 놓기 정답 인정)
+                    REQ['CREQ-52 1칸 블록 두 개 = 2칸'] = await pg.evaluate("BLOCKS.same(BLOCKS.parseProg(['flag','right:1','right:1']), BLOCKS.parseProg(['flag','right:2']))")
                 if not wrong_done:
                     # 공통 64: 틀린 걸 놓고 실행 → 별 0, 다시 맞게 놓으면 별 1 (빨간 X·땡 없음)
                     wrong_done = True
