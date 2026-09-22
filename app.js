@@ -1,7 +1,7 @@
 /* 윤이 블록 — 앱 로직 (의존성 없음). 영어 앱 v1.3.3 뼈대 + 세 앱 공통 코드(아빠 화면·별·한국어 녹음) */
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.4';
+  const APP_VERSION = '1.0.5';
   const C = window.CONTENT; const BK = window.BLOCKS; const B = C.blocks;
   const U = C.units;
   const DAYS = 5;
@@ -442,10 +442,11 @@
         <div class="mcol">
           <div class="bubble sm">똑같이 놓아 봐! <span class="muted">(정답: ${target.map(n => n.t === 'flag' ? '🚩' : B[n.t].icon + (n.n ? n.n : '')).join(' ')})</span>${target.some(n => n.n > 1) ? `<small>블록을 놓고 <b>숫자 1</b>을 눌러 ${target.find(n => n.n > 1).n}로 바꿔요. 1칸 블록을 ${target.find(n => n.n > 1).n}개 이어 붙여도 돼요.</small>` : ''}</div>
           <div class="ws" id="ws"></div>
-          <div class="row" style="justify-content:center;gap:10px"><button class="btn primary" data-act="run">▶ 실행</button><div class="hint" id="hint"></div></div>
+          <div class="row" style="justify-content:center;gap:10px"><button class="btn primary" data-act="run">▶ 실행</button><button class="btn" data-act="reset">↺ 처음부터</button><div class="hint" id="hint"></div></div>
         </div>
       </div>`, { wide: true }), {
       ...baseHandlers(),
+      reset: () => { hush(); if (closed) return; ws.set(isHat ? [] : BK.parseProg(['flag'])); stage.reset(); setHint(''); ko('처음부터 다시!'); },
       demo: async () => { hush(); stage.reset(); await stage.run({ lead: target }, isHat ? t : 'flag'); },
       say: () => { hush(); ko(`${d.name}. ${d.d}`); },
       run: async () => {
@@ -488,8 +489,8 @@
     const charDefs = chars.map(c => { const p = findAt(c.at); const fr = C.friends[c.id]; return { id: c.id, x: p.x, y: p.y, img: c.id === 'lead' ? leader().img : fr.img, name: c.id === 'lead' ? leaderName() : fr.name }; });
     const map = m.map.map(r => r.replace(/[A-Z]/g, '.'));
     const sols = {}; chars.forEach(c => { sols[c.id] = BK.parseProg(c.sol); });
-    const progs = {}; chars.forEach(c => { progs[c.id] = a.fix && c.given ? BK.parseProg(c.given) : BK.parseProg([c.hat || 'flag']); });
-    if (a.fix && !m.chars) progs.lead = BK.parseProg(m.given);
+    const initProgs = () => { const p = {}; chars.forEach(c => { p[c.id] = a.fix && c.given ? BK.parseProg(c.given) : BK.parseProg([c.hat || 'flag']); }); if (a.fix && !m.chars) p.lead = BK.parseProg(m.given); return p; };
+    const progs = initProgs();
     const palette = BK.paletteFor(m, unlockedUpTo(L.u, L.d));
     let cur = chars[0].id; let fails = 0, closed = false;
     const title = a.review ? '🔁 복습 미션' : a.fix ? '🔧 고치기 미션' : '🧩 미션';
@@ -503,12 +504,12 @@
         <div class="mcol">
           ${chars.length > 1 ? `<div class="ctabs">${charDefs.map(c => `<button class="ctab${c.id === cur ? ' on' : ''}" data-act="ctab" data-arg="${c.id}">${c.img} ${esc(c.name)}</button>`).join('')}</div>` : ''}
           <div class="ws" id="ws"></div>
-          <div class="row" style="justify-content:center;gap:10px"><button class="btn primary" data-act="run">▶ 실행</button><button class="btn" data-act="reset">↺ 다시</button><div class="hint" id="hint"></div></div>
+          <div class="row" style="justify-content:center;gap:10px"><button class="btn primary" data-act="run">▶ 실행</button><button class="btn" data-act="reset">↺ 처음부터</button><div class="hint" id="hint"></div></div>
         </div>
       </div>`, { wide: true }), {
       ...baseHandlers(),
-      ctab: id => { progs[cur] = ws.get(); cur = id; document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('on', b.dataset.arg === id)); ws.set(progs[cur]); ws.lockHat = true; },
-      reset: () => { hush(); stage.reset(); setHint(''); },
+      ctab: id => { progs[cur] = ws.get(); cur = id; document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('on', b.dataset.arg === id)); ws.set(progs[cur]); },
+      reset: () => { hush(); if (closed) return; const p = initProgs(); Object.assign(progs, p); ws.set(progs[cur]); stage.reset(); setHint(''); ko('처음부터 다시!'); }, // 블록판·무대 모두 처음 상태로 (힌트 횟수는 그대로)
       run: () => runMission('flag'),
     });
     stage = BK.Stage(document.getElementById('stage'), { map, legend: m.legend, chars: charDefs, theme: up.theme, dark: up.dark, speed: speedMs(), onPop: popSound, onBump: boop, onCollect: () => tone([660, 990], 0.08) });

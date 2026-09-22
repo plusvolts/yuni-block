@@ -115,6 +115,13 @@ async def run(name, vw, vh, mobile):
                     T64['fix'] = btn == 1 and ghost == 1 and calm and s1 == s0 and s2 == s0 and back and s3 == s0
                     print(' 64 fix: reveal', btn, ghost, calm, ' stars', s0, s1, '-> skip', s2, '-> prev+correct', s3, back)
                     continue
+                if 'reset' not in REQ:
+                    # ↺ 처음부터: 블록판이 처음 상태(시작 블록만 또는 고치기 문제의 주어진 블록)로, 무대도 처음 자리로
+                    await pg.evaluate("YUNI.lesson.setProg('lead', ['flag','right:1','left:1'])"); await pg.click('[data-act=run]'); await pg.wait_for_function("!YUNI.stage || YUNI.stage.running===0")
+                    await pg.click('[data-act=reset]'); await pg.wait_for_timeout(300)
+                    prog = await pg.evaluate("BLOCKS.toStr(YUNI.ws.get())"); items = await pg.evaluate("Object.keys(YUNI.stage.items).length"); pos = await pg.evaluate("(()=>{const c=YUNI.stage.chars.lead; return c.x===c.sx && c.y===c.sy})()")
+                    print(' reset:', prog, 'items', items, 'home', pos)
+                    REQ['↺ 처음부터: 블록판·무대 초기화'] = prog == 'flag' and items >= 1 and pos
                 await solve(act['sol'], act['chars']); await moved_from(k); s1 = await stars()
                 if 'mission' not in T64: T64['mission'] = s1 == s0 + 1; print(' mission solved: stars', s0, '->', s1)
             elif t == 'free':
