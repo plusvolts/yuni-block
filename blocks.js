@@ -53,8 +53,23 @@ window.BLOCKS = (() => {
     let dragging = null; // {node, from:'pal'|'prog', path, ghost, startX,startY, moved}
     function render() {
       root.innerHTML = `<div class="prog-wrap"><div class="prog-row main" data-body="">${ws.prog.map((n, i) => blockHtml(n, String(i))).join('')}<span class="prog-hint">${ws.prog.length ? '' : '아래 블록을 여기로 끌어와요'}</span></div></div>
+        <div class="blk-tools" hidden><span class="muted">고른 블록:</span><button class="btn small" data-tool="left" aria-label="앞으로">◀ 앞으로</button><button class="btn small" data-tool="right" aria-label="뒤로">뒤로 ▶</button><button class="btn small" data-tool="del" aria-label="지우기">🗑 지우기</button><button class="btn small" data-tool="close" aria-label="닫기">✕</button></div>
         <div class="palette">${ws.palette.map(palHtml).join('')}</div><div class="numpick" hidden></div>`;
       root.classList.toggle('locked', ws.locked);
+      if (ws.sel != null) { const el = root.querySelector(`.prog-row [data-path="${ws.sel}"]`); if (el) { el.classList.add('selected'); root.querySelector('.blk-tools').hidden = false; } else ws.sel = null; }
+    }
+    // 블록을 톡 하면 고르기 → ◀ ▶ 🗑 버튼으로 옮기거나 지우기 (끌기가 어려운 아이용)
+    function select(path) { ws.sel = (ws.sel === path ? null : path); render(); }
+    function tool(k) {
+      if (ws.sel == null) return;
+      if (k === 'close') { ws.sel = null; render(); return; }
+      const { list, idx } = parentList(ws.prog, ws.sel); const n = list[idx]; if (!n) { ws.sel = null; render(); return; }
+      const top = ws.sel.indexOf('.') < 0; const min = top && hatOf(ws.prog) && !isHat(n.t) ? 1 : 0;
+      if (k === 'del') { if (cfg.lockHat && isHat(n.t) && top) return; list.splice(idx, 1); ws.sel = null; if (cfg.onDelete) cfg.onDelete(n); }
+      else if (k === 'left' && idx > min && !isHat(n.t)) { list.splice(idx, 1); list.splice(idx - 1, 0, n); ws.sel = ws.sel.replace(/\d+$/, idx - 1); }
+      else if (k === 'right' && idx < list.length - 1 && !isHat(n.t)) { list.splice(idx, 1); list.splice(idx + 1, 0, n); ws.sel = ws.sel.replace(/\d+$/, idx + 1); }
+      else return;
+      render(); emit();
     }
     const emit = () => { if (cfg.onChange) cfg.onChange(ws.prog); };
     function setNum(path, v) { const n = at(ws.prog, path); if (n) { n.n = v; render(); emit(); } }
@@ -67,6 +82,7 @@ window.BLOCKS = (() => {
       pk.onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; e.stopPropagation(); const n = at(ws.prog, path); if (isEmo) n.v = b.dataset.v; else n.n = +b.dataset.v; pk.hidden = true; render(); emit(); };
     }
     root.addEventListener('click', e => {
+      const tl = e.target.closest('[data-tool]'); if (tl) { e.stopPropagation(); return tool(tl.dataset.tool); }
       const num = e.target.closest('[data-num]'); if (num && !ws.locked) { e.stopPropagation(); return showPicker(num, num.dataset.num, false); }
       const emo = e.target.closest('[data-emo]'); if (emo && !ws.locked) { e.stopPropagation(); return showPicker(emo, emo.dataset.emo, true); }
       const pk = root.querySelector('.numpick'); if (pk && !pk.hidden && !e.target.closest('.numpick')) pk.hidden = true;
@@ -100,8 +116,9 @@ window.BLOCKS = (() => {
         const g = document.createElement('div'); g.className = 'drag-ghost'; g.innerHTML = blockHtml(node, 'g', { ghost: true }); document.body.appendChild(g); dragging.ghost = g;
       }
       const g = dragging.ghost; g.style.left = e.clientX + 'px'; g.style.top = e.clientY + 'px';
-      root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over'));
-      const tgt = dropTarget(e.clientX, e.clientY, dragging); if (tgt && tgt.row) tgt.row.classList.add('over');
+      root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over')); root.querySelectorAll('.drop-mark').forEach(x => x.remove());
+      const tgt = dropTarget(e.clientX, e.clientY, dragging);
+      if (tgt && tgt.row) { tgt.row.classList.add('over'); const mk = document.createElement('span'); mk.className = 'drop-mark'; const ref = tgt.kids[tgt.idx]; if (ref) tgt.row.insertBefore(mk, ref); else { const hint = tgt.row.querySelector('.prog-hint, .c-gap'); tgt.row.insertBefore(mk, hint); } }
     });
     function dropTarget(x, y, d) {
       const g = d.ghost; if (!g) return null; g.style.display = 'none';
@@ -114,15 +131,16 @@ window.BLOCKS = (() => {
       if (row.classList.contains('c-body') && d.node && d.node.body) row = root.querySelector('.prog-row.main');
       const kids = [...row.children].filter(k => k.matches('[data-path]'));
       let idx = kids.length;
-      for (let i = 0; i < kids.length; i++) { const r = kids[i].getBoundingClientRect(); if (x < r.left + r.width / 2) { idx = i; break; } }
-      return { row, bodyPath: row.dataset.body, idx };
+      for (let i = 0; i < kids.length; i++) { const r = kids[i].getBoundingClientRect(); if (y < r.top - 6 || (y <= r.bottom + 6 && x < r.left + r.width / 2)) { idx = i; break; } }
+      return { row, bodyPath: row.dataset.body, idx, kids };
     }
     const finish = e => {
       clearTimeout(pressTimer);
       if (!dragging) return;
       const d = dragging; dragging = null;
-      root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over'));
-      if (!d.moved) return;
+      root.querySelectorAll('.prog-row.over').forEach(x => x.classList.remove('over')); root.querySelectorAll('.drop-mark').forEach(x => x.remove());
+      if (!d.moved) { if (d.from === 'prog' && !ws.locked) select(d.path); return; }
+      ws.sel = null;
       let tgt = null; try { tgt = dropTarget(e.clientX, e.clientY, d); } catch (x) { tgt = null; }
       if (d.ghost) d.ghost.remove(); document.querySelectorAll('.drag-ghost').forEach(x => x.remove());
       if (tgt && !tgt.del) {
@@ -137,7 +155,7 @@ window.BLOCKS = (() => {
       render(); emit();
     };
     root.addEventListener('pointerup', finish); root.addEventListener('pointercancel', finish);
-    ws.render = render; ws.set = p => { ws.prog = clone(p); render(); }; ws.get = () => clone(ws.prog);
+    ws.render = render; ws.set = p => { ws.prog = clone(p); ws.sel = null; render(); }; ws.select = select; ws.tool = tool; ws.get = () => clone(ws.prog);
     ws.setPalette = p => { ws.palette = p; render(); }; ws.lock = v => { ws.locked = v; render(); };
     ws.highlight = t => { root.querySelectorAll('[data-pal]').forEach(el => el.classList.toggle('glow', el.dataset.pal === t)); };
     ws.showGhost = prog => { // 힌트 2단계·정답: 놓을 자리를 흰 윤곽으로

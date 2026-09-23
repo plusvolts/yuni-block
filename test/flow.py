@@ -87,6 +87,16 @@ async def run(name, vw, vh, mobile):
                     n2 = await pg.evaluate("YUNI.ws.get().length"); ghosts2 = await pg.locator('.drag-ghost').count()
                     print(' drag: prog', n0, '->', n1, '-> delete', n2, ' ghosts', ghosts, ghosts2)
                     REQ['CREQ-52 끌어다 붙이기·팔레트로 끌어 삭제, 남는 유령 없음'] = n1 == n0 + 1 and n2 == n0 and ghosts == 0 and ghosts2 == 0
+                    # 블록이 많아도 옆 스크롤 없이 줄바꿈, 톡 해서 고르고 ◀ ▶ 🗑로 옮기기·지우기
+                    await pg.evaluate("YUNI.lesson.setProg('lead', ['flag','right:1','left:1','up:1','down:1','right:2','left:2','up:2','down:2','right:3','left:3','up:3','down:3','right:4','left:4'])"); await pg.wait_for_timeout(100)
+                    nowrap = await pg.evaluate("(()=>{const w=document.querySelector('.prog-wrap'); return w.scrollWidth<=w.clientWidth+1 && w.getBoundingClientRect().height>120})()")
+                    await pg.locator('.prog-row.main [data-path="2"]').click(); await pg.wait_for_timeout(100)
+                    sel = await pg.evaluate("document.querySelector('.blk.selected')?.dataset.path"); tools = not await pg.evaluate("document.querySelector('.blk-tools').hidden")
+                    await pg.click('[data-tool=right]'); await pg.wait_for_timeout(100); p1 = await pg.evaluate("BLOCKS.toStr(YUNI.ws.get().slice(0,4))")
+                    await pg.click('[data-tool=del]'); await pg.wait_for_timeout(100); p2 = await pg.evaluate("BLOCKS.toStr(YUNI.ws.get().slice(0,3))"); nsel = await pg.locator('.blk.selected').count()
+                    print(' edit: wrap', nowrap, 'sel', sel, tools, 'move->', p1, 'del->', p2)
+                    REQ['CREQ-52 블록 많으면 줄바꿈(옆 스크롤 없음)'] = nowrap
+                    REQ['CREQ-70 블록 톡 → 고르기, ▶로 순서 바꾸기, 🗑로 지우기'] = sel == '2' and tools and p1 == 'flag,right:1,up:1,left:1' and p2 == 'flag,right:1,up:1' and nsel == 0
                     # 1칸 블록 두 개 = 2칸 (따라 놓기 정답 인정)
                     REQ['CREQ-52 1칸 블록 두 개 = 2칸'] = await pg.evaluate("BLOCKS.same(BLOCKS.parseProg(['flag','right:1','right:1']), BLOCKS.parseProg(['flag','right:2']))")
                 if not wrong_done:

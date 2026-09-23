@@ -1,7 +1,7 @@
 /* 윤이 블록 — 앱 로직 (의존성 없음). 영어 앱 v1.3.3 뼈대 + 세 앱 공통 코드(아빠 화면·별·한국어 녹음) */
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.5';
+  const APP_VERSION = '1.0.6';
   const C = window.CONTENT; const BK = window.BLOCKS; const B = C.blocks;
   const U = C.units;
   const DAYS = 5;

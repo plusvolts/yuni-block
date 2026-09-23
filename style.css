@@ -260,9 +260,13 @@ textarea { min-height: 90px; font-family: ui-monospace, monospace; font-size: 13
 .goalbar .gi { background: var(--card); border-radius: 12px; padding: 2px 8px; font-size: clamp(22px, 3.5vw, 32px); box-shadow: var(--shadow); }
 /* 블록판 */
 .ws { position: relative; display: grid; gap: 8px; }
-.prog-wrap { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px; overflow-x: auto; min-height: 96px; }
+.prog-wrap { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px; min-height: 96px; }
 .prog-row { display: flex; align-items: center; gap: 4px; min-height: 76px; }
-.prog-row.main { min-width: 100%; }
+.prog-row.main { flex-wrap: wrap; row-gap: 10px; } /* 블록이 많으면 옆으로 스크롤하지 않고 다음 줄로 접혀요 */
+.drop-mark { display: inline-block; width: 8px; height: 60px; border-radius: 4px; background: var(--primary); flex: none; animation: glow 1s ease-in-out infinite; }
+.blk.selected { outline: 4px solid #fff; box-shadow: 0 0 0 4px var(--primary), 0 4px 0 rgba(0,0,0,.18); transform: translateY(-3px); }
+.blk-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; background: var(--card); border-radius: 16px; padding: 6px 10px; box-shadow: var(--shadow); }
+.blk-tools[hidden] { display: none; }
 .prog-row.over { outline: 3px dashed var(--primary); outline-offset: 2px; border-radius: 14px; }
 .prog-hint { color: var(--muted); font-weight: 700; padding: 0 10px; }
 .palette { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; background: var(--bg); border: 2px dashed var(--line); border-radius: var(--radius); padding: 10px; min-height: 84px; }
