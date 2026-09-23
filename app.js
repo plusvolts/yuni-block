@@ -1,7 +1,7 @@
 /* 윤이 블록 — 앱 로직 (의존성 없음). 영어 앱 v1.3.3 뼈대 + 세 앱 공통 코드(아빠 화면·별·한국어 녹음) */
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.6';
+  const APP_VERSION = '1.1.0';
   const C = window.CONTENT; const BK = window.BLOCKS; const B = C.blocks;
   const U = C.units;
   const DAYS = 5;
@@ -137,6 +137,7 @@
   const ding = () => tone([880, 1320], 0.14);
   const boop = () => tone([300, 220], 0.16);
   const popSound = () => tone([700, 1100, 1500], 0.07);
+  const soundFx = t => { if (t === 'drum') tone([90, 70, 90, 70], 0.16); else if (t === 'clap') tone([1800, 1500], 0.05); else if (t === 'music') tone([523, 659, 784, 659, 523, 784, 1046], 0.18); };
 
   /* ================= 화면 관리 ================= */
   let H = {}; let screen = ''; let actToken = 0;
@@ -466,7 +467,7 @@
         }
       },
     });
-    stage = BK.Stage(document.getElementById('stage'), { map: mapDemo, legend: {}, chars: [{ id: 'lead', x: 0, y: 2, img: leader().img }], theme: U[L.u].theme, dark: U[L.u].dark, tray: false, speed: speedMs(), onPop: popSound, onBump: boop });
+    stage = BK.Stage(document.getElementById('stage'), { map: mapDemo, legend: {}, chars: [{ id: 'lead', x: 0, y: 2, img: leader().img }], theme: U[L.u].theme, dark: U[L.u].dark, tray: false, speed: speedMs(), onPop: popSound, onSound: soundFx, onBump: boop });
     ws = BK.Workspace(document.getElementById('ws'), { palette: palette, prog: isHat ? [] : BK.parseProg(['flag']), lockHat: !isHat, onSpeak: speakBlock });
     L.setProg = (id, arr) => ws.set(BK.parseProg(arr)); L.target = demoProg; // 테스트용
     const my = actToken;
@@ -512,7 +513,7 @@
       reset: () => { hush(); if (closed) return; const p = initProgs(); Object.assign(progs, p); ws.set(progs[cur]); stage.reset(); setHint(''); ko('처음부터 다시!'); }, // 블록판·무대 모두 처음 상태로 (힌트 횟수는 그대로)
       run: () => runMission('flag'),
     });
-    stage = BK.Stage(document.getElementById('stage'), { map, legend: m.legend, chars: charDefs, theme: up.theme, dark: up.dark, speed: speedMs(), onPop: popSound, onBump: boop, onCollect: () => tone([660, 990], 0.08) });
+    stage = BK.Stage(document.getElementById('stage'), { map, legend: m.legend, chars: charDefs, theme: up.theme, dark: up.dark, speed: speedMs(), onPop: popSound, onSound: soundFx, onBump: boop, onCollect: () => tone([660, 990], 0.08) });
     ws = BK.Workspace(document.getElementById('ws'), { palette, prog: progs[cur], lockHat: true, onSpeak: speakBlock, onChange: p => { progs[cur] = p; } });
     // 무대 캐릭터 톡 → 그 캐릭터의 "나를 톡 하면" 프로그램 실행
     stage.root.addEventListener('click', e => { const el = e.target.closest('[data-char]'); if (el && !closed) runMission('tap', el.dataset.char); });
@@ -581,7 +582,7 @@
     const mapFree = () => { const rows = Array.from({ length: C.H }, () => '.'.repeat(C.W).split('')); const legend = {}; items.forEach((it, i) => { const ch = String.fromCharCode(97 + (i % 26)); rows[it.y][it.x] = ch; legend[ch] = it.img; }); return { map: rows.map(r => r.join('')), legend }; };
     const mount = () => {
       const mf = mapFree();
-      stage = BK.Stage(document.getElementById('stage'), { map: mf.map, legend: mf.legend, chars: chars.map(c => ({ ...c, img: imgOf(c.id), name: nameOf(c.id) })), theme: up.theme, dark: up.dark, tray: false, speed: speedMs(), onPop: popSound, onBump: boop });
+      stage = BK.Stage(document.getElementById('stage'), { map: mf.map, legend: mf.legend, chars: chars.map(c => ({ ...c, img: imgOf(c.id), name: nameOf(c.id) })), theme: up.theme, dark: up.dark, tray: false, speed: speedMs(), onPop: popSound, onSound: soundFx, onBump: boop });
       ws = BK.Workspace(document.getElementById('ws'), { palette: [...palette, 'flag', 'tap'].filter((x, i, a) => a.indexOf(x) === i && unlocked.includes(x)), prog: progs[cur], lockHat: false, onSpeak: speakBlock, onChange: p => { progs[cur] = p; saved = false; } });
       stage.root.addEventListener('click', e => { const el = e.target.closest('[data-char]'); if (!el) return; const id = el.dataset.char; if (progs[id] && BK.hatOf(progs[id]) === 'tap') { hush(); stage.runOne(id, progs, 'tap'); } else { cur = id; document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('on', b.dataset.arg === id)); ws.set(progs[cur]); } });
       if (L) L.setProg = (id, arr) => { progs[id] = BK.parseProg(arr); if (id === cur) ws.set(progs[cur]); }; // 테스트용

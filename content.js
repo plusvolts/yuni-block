@@ -43,6 +43,20 @@ window.CONTENT = (() => {
     send: { cat: 'control', icon: '📨', name: '편지 보내기', d: '친구에게 색 편지를 보내요' },
     forever: { cat: 'end', icon: '♾️', name: '계속 반복', d: '앞의 블록을 계속 반복해요' },
     page: { cat: 'end', icon: '📖', name: '다음 장면', d: '다음 장면으로 넘어가요' },
+    /* v1.1.0 추가 (다른 블록코딩 앱 참고: ScratchJr 모양·소리, Scratch 펜·효과, Lightbot 끝까지 가기) */
+    dash: { cat: 'motion', icon: '🏃', name: '끝까지 달리기', d: '가던 방향으로 막힐 때까지 달려요' },
+    spin: { cat: 'motion', icon: '🔄', name: '빙글 돌기', d: '제자리에서 한 바퀴 돌아요' },
+    color: { cat: 'looks', icon: '🎨', name: '색 바꾸기', d: '몸 색깔이 바뀌어요' },
+    flash: { cat: 'looks', icon: '✨', name: '반짝이기', d: '반짝반짝 빛나요' },
+    dance: { cat: 'looks', icon: '💃', name: '춤추기', d: '신나게 춤을 춰요' },
+    paint: { cat: 'looks', icon: '🖍️', name: '칠하기', d: '서 있는 칸을 색칠해요' },
+    plant: { cat: 'looks', icon: '🌱', name: '놓기', d: '서 있는 칸에 물건을 놓아요' },
+    drum: { cat: 'sound', icon: '🥁', name: '북 소리', d: '둥둥 북 소리를 내요' },
+    music: { cat: 'sound', icon: '🎵', name: '음악', d: '짧은 노래를 틀어요' },
+    clap: { cat: 'sound', icon: '👏', name: '박수', d: '짝짝 박수를 쳐요' },
+    fast: { cat: 'control', icon: '🐇', name: '빨리', d: '이제부터 빨리 움직여요' },
+    slow: { cat: 'control', icon: '🐢', name: '천천히', d: '이제부터 천천히 움직여요' },
+    stop: { cat: 'control', icon: '🛑', name: '멈추기', d: '모두 멈춰요' },
   };
   const catName = { start: '시작', motion: '움직임', looks: '모양', sound: '소리', control: '제어', end: '끝' };
 
@@ -62,16 +76,16 @@ window.CONTENT = (() => {
         { name: '왼쪽 빨랫줄', say: '{F}: 이번엔 왼쪽이야!', f: 'chorok', map: ['........', '........', '.a...S..', '........', '........'], legend: { a: '👕' }, sol: ['left:4'] },
         { name: '초록이 블록 고치기', say: '{F}: 왼쪽으로 갔는데 옷이 없어…', f: 'chorok', map: ['........', '........', '..S...a.', '........', '........'], legend: { a: '🩳' }, sol: ['right:4'], given: ['left:4'] },
       ] },
-      { unlock: [], sticker: '🩳', m: [
-        { name: '두 개를 한 번에', say: '{F}: 가는 길에 있는 빨래를 다 걷어 줘!', f: 'imo', map: ['........', '........', 'S.a..b..', '........', '........'], legend: { a: '🧦', b: '🧦' }, sol: ['right:5'] },
+      { unlock: ['drum'], sticker: '🩳', m: [
+        { name: '두 개를 한 번에', say: '{F}: 가는 길에 있는 빨래를 다 걷어 줘! 다 걷으면 북을 둥둥 쳐 줘!', f: 'imo', map: ['........', '........', 'S.a..b..', '........', '........'], legend: { a: '🧦', b: '🧦' }, sol: ['right:5'] },
         { name: '미소 블록 고치기', say: '{F}: 오빠, 이거 왜 반대로 가?', f: 'miso', map: ['........', '........', 'a..S....', '........', '........'], legend: { a: '👕' }, sol: ['left:3'], given: ['right:3'] },
       ] },
-      { unlock: [], sticker: '🧣', m: [
-        { name: '양쪽 빨래', say: '{F}: 오른쪽 먼저, 그다음 왼쪽!', f: 'samchon', map: ['........', '........', '.b.S.a..', '........', '........'], legend: { a: '🧣', b: '🧤' }, sol: ['right:2', 'left:4'] },
+      { unlock: ['dance'], sticker: '🧣', m: [
+        { name: '양쪽 빨래', say: '{F}: 오른쪽 먼저, 그다음 왼쪽! 다 하면 춤도 한 번!', f: 'samchon', map: ['........', '........', '.b.S.a..', '........', '........'], legend: { a: '🧣', b: '🧤' }, sol: ['right:2', 'left:4'] },
         { name: '현이 블록 고치기', say: '{F}: 하나는 되는데 하나가 안 돼…', f: 'hyun', map: ['........', '........', '.b.S.a..', '........', '........'], legend: { a: '🧣', b: '🧤' }, sol: ['right:2', 'left:4'], given: ['right:2', 'left:1'] },
       ] },
-      { unlock: [], sticker: '🧺', m: [
-        { name: '빨래 다 걷기', say: '{F}: 비 온다! 빨래 세 개 다 걷어 줘!', f: 'imo', map: ['........', '........', 'ca.S.b..', '........', '........'], legend: { a: '🧦', b: '👕', c: '🩳' }, sol: ['left:2', 'right:4', 'left:5'] },
+      { unlock: ['clap'], sticker: '🧺', m: [
+        { name: '빨래 다 걷기', say: '{F}: 비 온다! 빨래 세 개 다 걷어 줘! 다 걷으면 박수 짝짝!', f: 'imo', map: ['........', '........', 'ca.S.b..', '........', '........'], legend: { a: '🧦', b: '👕', c: '🩳' }, sol: ['left:2', 'right:4', 'left:5'] },
         { name: '초록이 블록 고치기', say: '{F}: 마지막 하나를 못 걷어…', f: 'chorok', map: ['........', '........', 'ca.S.b..', '........', '........'], legend: { a: '🧦', b: '👕', c: '🩳' }, sol: ['left:2', 'right:4', 'left:5'], given: ['left:2', 'right:4', 'left:2'] },
       ] },
     ],
@@ -83,20 +97,20 @@ window.CONTENT = (() => {
         { name: '빵을 가져와', say: '{F}: 위 선반에 빵이 있어. 올라가서 가져와!', f: 'imo', map: ['........', '..a.....', '........', '........', '..S.....'], legend: { a: '🍞' }, sol: ['up:3'] },
         { name: '현이 블록 고치기', say: '{F}: 빵까지 안 닿아…', f: 'hyun', map: ['..a.....', '........', '........', '........', '..S.....'], legend: { a: '🍞' }, sol: ['up:4'], given: ['up:2'] },
       ] },
-      { unlock: [], sticker: '🥬', m: [
-        { name: '빵 위에 양상추', say: '{F}: 빵 먼저, 그다음 양상추! 순서대로.', f: 'imo', map: ['...b....', '........', '...a....', '........', '...S....'], legend: { a: '🍞', b: '🥬' }, order: ['a', 'b'], sol: ['up:4'] },
+      { unlock: ['color'], sticker: '🥬', m: [
+        { name: '빵 위에 양상추', say: '{F}: 빵 먼저, 그다음 양상추! 순서대로. 양상추를 올리면 색을 바꿔 봐!', f: 'imo', map: ['...b....', '........', '...a....', '........', '...S....'], legend: { a: '🍞', b: '🥬' }, order: ['a', 'b'], sol: ['up:4'] },
         { name: '미소 블록 고치기', say: '{F}: 양상추가 남았어…', f: 'miso', map: ['...b....', '........', '...a....', '........', '...S....'], legend: { a: '🍞', b: '🥬' }, order: ['a', 'b'], sol: ['up:4'], given: ['up:2'] },
       ] },
       { unlock: ['down'], sticker: '🧀', m: [
         { name: '순서가 중요해', say: '{F}: 빵 → 양상추 순서야. 양상추를 먼저 집으면 이상한 샌드위치!', f: 'imo', map: ['........', '........', 'S.b.....', '........', '..a.....'], legend: { a: '🍞', b: '🥬' }, order: ['a', 'b'], sol: ['down:2', 'right:2', 'up:2'] },
         { name: '초록이 블록 고치기', say: '{F}: 양상추가 먼저 올라갔어… 이상해!', f: 'chorok', map: ['........', '........', 'S.b.....', '........', '..a.....'], legend: { a: '🍞', b: '🥬' }, order: ['a', 'b'], sol: ['down:2', 'right:2', 'up:2'], given: ['right:2', 'down:2', 'up:2'] },
       ] },
-      { unlock: [], sticker: '🍅', m: [
-        { name: '세 겹 샌드위치', say: '{F}: 빵, 양상추, 치즈! 순서대로 모아 줘.', f: 'samchon', map: ['..a.....', '........', '..S.b...', '........', '....c...'], legend: { a: '🍞', b: '🥬', c: '🧀' }, order: ['a', 'b', 'c'], sol: ['up:2', 'down:2', 'right:2', 'down:2'] },
+      { unlock: ['flash'], sticker: '🍅', m: [
+        { name: '세 겹 샌드위치', say: '{F}: 빵, 양상추, 치즈! 순서대로 모아 줘. 치즈까지 올리면 반짝!', f: 'samchon', map: ['..a.....', '........', '..S.b...', '........', '....c...'], legend: { a: '🍞', b: '🥬', c: '🧀' }, order: ['a', 'b', 'c'], sol: ['up:2', 'down:2', 'right:2', 'down:2'] },
         { name: '현이 블록 고치기', say: '{F}: 치즈까지 안 가…', f: 'hyun', map: ['..a.....', '........', '..S.b...', '........', '....c...'], legend: { a: '🍞', b: '🥬', c: '🧀' }, order: ['a', 'b', 'c'], sol: ['up:2', 'down:2', 'right:2', 'down:2'], given: ['up:2', 'down:2', 'right:2', 'up:2'] },
       ] },
-      { unlock: [], sticker: '🥪', m: [
-        { name: '샌드위치 완성!', say: '{F}: 빵, 양상추, 치즈, 그리고 다시 빵! 완성해 보자.', f: 'imo', map: ['S.......', '........', 'a.b.....', '........', '..c..d..'], legend: { a: '🍞', b: '🥬', c: '🧀', d: '🍞' }, order: ['a', 'b', 'c', 'd'], sol: ['down:2', 'right:2', 'down:2', 'right:3'] },
+      { unlock: ['music'], sticker: '🥪', m: [
+        { name: '샌드위치 완성!', say: '{F}: 빵, 양상추, 치즈, 그리고 다시 빵! 완성해 보자. 완성하면 노래를 틀어 줘!', f: 'imo', map: ['S.......', '........', 'a.b.....', '........', '..c..d..'], legend: { a: '🍞', b: '🥬', c: '🧀', d: '🍞' }, order: ['a', 'b', 'c', 'd'], sol: ['down:2', 'right:2', 'down:2', 'right:3'] },
         { name: '미소 블록 고치기', say: '{F}: 마지막 빵이 없어!', f: 'miso', map: ['S.......', '........', 'a.b.....', '........', '..c..d..'], legend: { a: '🍞', b: '🥬', c: '🧀', d: '🍞' }, order: ['a', 'b', 'c', 'd'], sol: ['down:2', 'right:2', 'down:2', 'right:3'], given: ['down:2', 'right:2', 'down:2', 'left:3'] },
       ] },
     ],
@@ -108,20 +122,20 @@ window.CONTENT = (() => {
         { name: '뿅! 잡았다', say: '{F}: 물고기 옆에 가서 뿅 소리로 잡아 봐!', f: 'samchon', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🐟' }, need: ['pop'], sol: ['right:3', 'pop'] },
         { name: '삼촌 블록 고치기', say: '{F}: 어? 물고기 앞에서 멈췄네.', f: 'samchon', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🐟' }, need: ['pop'], sol: ['right:3', 'pop'], given: ['right:2', 'pop'] },
       ] },
-      { unlock: [], sticker: '🦐', m: [
-        { name: '돌을 돌아서', say: '{F}: 돌은 못 지나가. 위로 돌아가자!', f: 'hyun', map: ['........', '........', 'S.#.a...', '........', '........'], legend: { a: '🦐' }, need: ['pop'], sol: ['up:1', 'right:4', 'down:1', 'pop'] },
+      { unlock: ['dash'], sticker: '🦐', m: [
+        { name: '돌을 돌아서', say: '{F}: 돌은 못 지나가. 위로 돌아가자! 끝까지 달리기로 한 번에 가 봐.', f: 'hyun', map: ['........', '........', 'S.#.a...', '........', '........'], legend: { a: '🦐' }, need: ['pop', 'dash'], sol: ['up:1', 'right:1', 'dash', 'left:3', 'down:1', 'pop'] },
         { name: '현이 블록 고치기', say: '{F}: 돌에 쿵 부딪혀…', f: 'hyun', map: ['........', '........', 'S.#.a...', '........', '........'], legend: { a: '🦐' }, need: ['pop'], sol: ['up:1', 'right:4', 'down:1', 'pop'], given: ['right:4', 'pop'] },
       ] },
-      { unlock: [], sticker: '🐸', m: [
-        { name: '위아래 물고기', say: '{F}: 위에 하나, 아래에 하나! 둘 다 잡아.', f: 'chorok', map: ['...a....', '........', '...S....', '........', '...b....'], legend: { a: '🐟', b: '🐟' }, need: ['pop'], sol: ['up:2', 'pop', 'down:4', 'pop'] },
+      { unlock: ['spin'], sticker: '🐸', m: [
+        { name: '위아래 물고기', say: '{F}: 위에 하나, 아래에 하나! 둘 다 잡아. 물고기를 다 잡으면 빙글 돌기!', f: 'chorok', map: ['...a....', '........', '...S....', '........', '...b....'], legend: { a: '🐟', b: '🐟' }, need: ['pop'], sol: ['up:2', 'pop', 'down:4', 'pop'] },
         { name: '초록이 블록 고치기', say: '{F}: 아래 물고기까지 안 가…', f: 'chorok', map: ['...a....', '........', '...S....', '........', '...b....'], legend: { a: '🐟', b: '🐟' }, need: ['pop'], sol: ['up:2', 'pop', 'down:4', 'pop'], given: ['up:2', 'pop', 'down:2', 'pop'] },
       ] },
-      { unlock: [], sticker: '🪣', m: [
-        { name: '돌 사이로', say: '{F}: 돌이 많아! 길을 잘 찾아 봐.', f: 'miso', map: ['........', '.#.#....', 'S.#.a...', '.#.#....', '........'], legend: { a: '🐟' }, need: ['pop'], sol: ['up:2', 'right:4', 'down:2', 'pop'] },
+      { unlock: ['fast'], sticker: '🪣', m: [
+        { name: '돌 사이로', say: '{F}: 돌이 많아! 길을 잘 찾아 봐. 빨리 블록으로 서둘러!', f: 'miso', map: ['........', '.#.#....', 'S.#.a...', '.#.#....', '........'], legend: { a: '🐟' }, need: ['pop'], sol: ['up:2', 'right:4', 'down:2', 'pop'] },
         { name: '미소 블록 고치기', say: '{F}: 돌에 막혔어!', f: 'miso', map: ['........', '.#.#....', 'S.#.a...', '.#.#....', '........'], legend: { a: '🐟' }, need: ['pop'], sol: ['up:2', 'right:4', 'down:2', 'pop'], given: ['up:1', 'right:4', 'down:1', 'pop'] },
       ] },
-      { unlock: [], sticker: '🐠', m: [
-        { name: '물고기 세 마리', say: '{F}: 오늘 저녁은 생선구이! 세 마리 잡아 줘.', f: 'samchon', map: ['....b...', '........', 'S.a.....', '........', '......c.'], legend: { a: '🐟', b: '🐟', c: '🐟' }, need: ['pop'], sol: ['right:2', 'pop', 'right:2', 'up:2', 'pop', 'down:4', 'right:2', 'pop'] },
+      { unlock: ['slow'], sticker: '🐠', m: [
+        { name: '물고기 세 마리', say: '{F}: 오늘 저녁은 생선구이! 세 마리 잡아 줘. 천천히 블록으로 조용히 다가가!', f: 'samchon', map: ['....b...', '........', 'S.a.....', '........', '......c.'], legend: { a: '🐟', b: '🐟', c: '🐟' }, need: ['pop'], sol: ['right:2', 'pop', 'right:2', 'up:2', 'pop', 'down:4', 'right:2', 'pop'] },
         { name: '삼촌 블록 고치기', say: '{F}: 한 마리를 놓쳤어!', f: 'samchon', map: ['....b...', '........', 'S.a.....', '........', '......c.'], legend: { a: '🐟', b: '🐟', c: '🐟' }, need: ['pop'], sol: ['right:2', 'pop', 'right:2', 'up:2', 'pop', 'down:4', 'right:2', 'pop'], given: ['right:2', 'pop', 'right:2', 'up:2', 'pop', 'down:2', 'right:2', 'pop'] },
       ] },
     ],
@@ -137,16 +151,16 @@ window.CONTENT = (() => {
         { name: '찾았다! 말하기', say: '{F}: 장작을 찾으면 "찾았다!" 하고 말해 줘.', f: 'miso', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🪵' }, need: ['say'], sol: ['right:3', 'say:🎉'] },
         { name: '미소 블록 고치기', say: '{F}: 말풍선이 안 나와…', f: 'miso', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🪵' }, need: ['say'], sol: ['right:3', 'say:🎉'], given: ['right:3', 'pop'] },
       ] },
-      { unlock: [], sticker: '🪨', m: [
-        { name: '장작 두 개', say: '{F}: 돌 너머에 장작이 두 개 있어!', f: 'chorok', map: ['........', '........', 'S#a.#.b.', '........', '........'], legend: { a: '🪵', b: '🪵' }, sol: ['jump', 'right:1', 'jump', 'right:1'] },
+      { unlock: ['paint'], sticker: '🪨', m: [
+        { name: '장작 두 개', say: '{F}: 돌 너머에 장작이 두 개 있어! 장작을 주운 자리는 칠하기로 표시해 줘!', f: 'chorok', map: ['........', '........', 'S#a.#.b.', '........', '........'], legend: { a: '🪵', b: '🪵' }, sol: ['jump', 'right:1', 'jump', 'right:1'] },
         { name: '초록이 블록 고치기', say: '{F}: 두 번째 돌에 막혔어.', f: 'chorok', map: ['........', '........', 'S#a.#.b.', '........', '........'], legend: { a: '🪵', b: '🪵' }, sol: ['jump', 'right:1', 'jump', 'right:1'], given: ['jump', 'right:1', 'right:2'] },
       ] },
       { unlock: ['home'], sticker: '🏠', m: [
         { name: '장작 들고 집으로', say: '{F}: 장작을 주워서 모닥불 자리(처음 자리)로 돌아와!', f: 'samchon', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🪵' }, need: ['home'], sol: ['right:3', 'home'] },
         { name: '삼촌 블록 고치기', say: '{F}: 장작은 주웠는데 돌아오질 않네.', f: 'samchon', map: ['........', '........', 'S..a....', '........', '........'], legend: { a: '🪵' }, need: ['home'], sol: ['right:3', 'home'], given: ['right:3', 'left:1'] },
       ] },
-      { unlock: [], sticker: '🔥', m: [
-        { name: '모닥불 완성!', say: '{F}: 장작 세 개를 모아 돌아오면 모닥불이 활활!', f: 'imo', map: ['....b...', '........', 'S#a.....', '........', '....c...'], legend: { a: '🪵', b: '🪵', c: '🪵' }, need: ['home', 'say'], sol: ['jump', 'right:2', 'up:2', 'down:4', 'home', 'say:🔥'] },
+      { unlock: ['stop'], sticker: '🔥', m: [
+        { name: '모닥불 완성!', say: '{F}: 장작 세 개를 모아 돌아오면 모닥불이 활활! 모닥불이 켜지면 멈추기!', f: 'imo', map: ['....b...', '........', 'S#a.....', '........', '....c...'], legend: { a: '🪵', b: '🪵', c: '🪵' }, need: ['home', 'say'], sol: ['jump', 'right:2', 'up:2', 'down:4', 'home', 'say:🔥'] },
         { name: '현이 블록 고치기', say: '{F}: 하나 빠뜨렸어!', f: 'hyun', map: ['....b...', '........', 'S#a.....', '........', '....c...'], legend: { a: '🪵', b: '🪵', c: '🪵' }, need: ['home', 'say'], sol: ['jump', 'right:2', 'up:2', 'down:4', 'home', 'say:🔥'], given: ['jump', 'right:2', 'up:2', 'down:2', 'home', 'say:🔥'] },
       ] },
     ],
@@ -158,8 +172,8 @@ window.CONTENT = (() => {
         { name: '미소를 톡!', say: '{F}: 나도 도울래! 나를 톡 하면 폴대를 가져올게.', f: 'miso', map: ['........', 'S..a....', '........', 'M..b....', '........'], legend: { a: '🥢', b: '🥢' }, chars: [{ id: 'lead', at: 'S', sol: ['right:3'] }, { id: 'miso', at: 'M', hat: 'tap', sol: ['tap', 'right:3'] }], sol: ['right:3'] },
         { name: '미소 블록 고치기', say: '{F}: 톡 했는데 안 움직여…', f: 'miso', map: ['........', 'S..a....', '........', 'M..b....', '........'], legend: { a: '🥢', b: '🥢' }, chars: [{ id: 'lead', at: 'S', sol: ['right:3'], given: ['right:3'] }, { id: 'miso', at: 'M', hat: 'tap', sol: ['tap', 'right:3'], given: ['tap', 'left:3'] }], sol: ['right:3'] },
       ] },
-      { unlock: [], sticker: '🟦', m: [
-        { name: '천을 가져와', say: '{F}: 이번엔 현이를 톡 해서 천을 가져오자.', f: 'hyun', map: ['........', 'S....a..', '........', 'H..b....', '........'], legend: { a: '🟦', b: '🟦' }, chars: [{ id: 'lead', at: 'S', sol: ['right:5'] }, { id: 'hyun', at: 'H', hat: 'tap', sol: ['tap', 'right:3'] }], sol: ['right:5'] },
+      { unlock: ['plant'], sticker: '🟦', m: [
+        { name: '천을 가져와', say: '{F}: 이번엔 현이를 톡 해서 천을 가져오자. 천을 가져오면 그 자리에 놓기!', f: 'hyun', map: ['........', 'S....a..', '........', 'H..b....', '........'], legend: { a: '🟦', b: '🟦' }, chars: [{ id: 'lead', at: 'S', sol: ['right:5'] }, { id: 'hyun', at: 'H', hat: 'tap', sol: ['tap', 'right:3'] }], sol: ['right:5'] },
         { name: '현이 블록 고치기', say: '{F}: 내 천이 저기 있는데…', f: 'hyun', map: ['........', 'S....a..', '........', 'H..b....', '........'], legend: { a: '🟦', b: '🟦' }, chars: [{ id: 'lead', at: 'S', sol: ['right:5'], given: ['right:5'] }, { id: 'hyun', at: 'H', hat: 'tap', sol: ['tap', 'right:3'], given: ['tap', 'right:1'] }], sol: ['right:5'] },
       ] },
       { unlock: ['wait'], sticker: '⏳', m: [

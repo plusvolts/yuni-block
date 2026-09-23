@@ -171,14 +171,14 @@ window.BLOCKS = (() => {
   /* ---------- 무대 ---------- */
   function Stage(root, cfg) {
     // cfg: { map:[rows], legend:{a:'🍎'}, chars:[{id,x,y,img,name,color}], theme, dark, order:[letters], onCollect, onBump, onSay, speed(ms/칸), free:bool }
-    const st = { items: {}, rocks: {}, chars: {}, collected: [], executed: {}, running: 0, stopped: false, speed: cfg.speed || 450 };
+    const st = { items: {}, rocks: {}, chars: {}, collected: [], executed: {}, running: 0, stopped: false, speed: cfg.speed || 450, baseSpeed: cfg.speed || 450, painted: {}, planted: {} };
     const key = (x, y) => `${x},${y}`;
     (cfg.map || []).forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '#') st.rocks[key(x, y)] = 1; else if (/[a-z]/.test(ch)) st.items[key(x, y)] = { id: ch, img: (cfg.legend || {})[ch] || '⭐' }; }));
     cfg.chars.forEach(c => { st.chars[c.id] = { ...c, sx: c.x, sy: c.y, dir: 'right', size: 1, visible: true, bubble: '' }; });
     function render() {
-      const cells = []; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const k = key(x, y); cells.push(`<div class="cell${st.rocks[k] ? ' rock' : ''}${(x + y) % 2 ? ' alt' : ''}" data-x="${x}" data-y="${y}">${st.rocks[k] ? '🪨' : st.items[k] ? `<span class="item" data-k="${k}">${st.items[k].img}</span>` : ''}</div>`); }
+      const cells = []; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const k = key(x, y); cells.push(`<div class="cell${st.rocks[k] ? ' rock' : ''}${(x + y) % 2 ? ' alt' : ''}${st.painted[k] != null ? ' painted' : ''}" data-x="${x}" data-y="${y}"${st.painted[k] != null ? ` style="--hue:${st.painted[k]}deg"` : ''}>${st.rocks[k] ? '🪨' : st.items[k] ? `<span class="item" data-k="${k}">${st.items[k].img}</span>` : st.planted[k] ? `<span class="planted">${st.planted[k]}</span>` : ''}</div>`); }
       root.innerHTML = `<div class="grid-stage${cfg.dark ? ' dark' : ''}" style="background:${cfg.theme || '#e9f5db'}">${cells.join('')}
-        ${Object.values(st.chars).map(c => `<div class="actor" data-char="${c.id}" style="--x:${c.x};--y:${c.y};--s:${c.size};opacity:${c.visible ? 1 : .15}"><span class="bub${c.bubble ? '' : ' off'}">${esc(c.bubble)}</span><span class="face">${c.img}</span></div>`).join('')}
+        ${Object.values(st.chars).map(c => `<div class="actor" data-char="${c.id}" style="--x:${c.x};--y:${c.y};--s:${c.size};--hue:${c.hue || 0}deg;opacity:${c.visible ? 1 : .15}"><span class="bub${c.bubble ? '' : ' off'}">${esc(c.bubble)}</span><span class="face">${c.img}</span></div>`).join('')}
         <div class="tray">${cfg.tray !== false ? st.collected.map(i => `<span>${i.img}</span>`).join('') : ''}</div></div>`;
     }
     function actorEl(id) { return root.querySelector(`[data-char="${id}"]`); }
@@ -222,13 +222,25 @@ window.BLOCKS = (() => {
         else if (n.t === 'wait') { const el = actorEl(c.id); if (el) { const b = el.querySelector('.bub'); b.textContent = '⏳'; b.classList.remove('off'); } await sleep(n.n * 500); if (el) el.querySelector('.bub').classList.add('off'); }
         else if (n.t === 'repeat') { for (let i = 0; i < n.n; i++) { if (st.stopped) return; await exec(c, n.body || [], trigger, depth + 1); } }
         else if (n.t === 'send') { if (cfg.onSend) cfg.onSend(c); await sleep(300); }
+        /* v1.1.0 새 블록 */
+        else if (n.t === 'dash') { const [dx, dy] = DIRS[c.dir]; const el = actorEl(c.id); if (el) el.classList.add('dash'); let moved = 0; while (free(c.x + dx, c.y + dy) && moved < 8) { c.x += dx; c.y += dy; moved++; moveEl(c); await sleep(Math.max(90, st.speed / 3)); collect(c, trigger); if (st.stopped) break; } if (el) el.classList.remove('dash'); if (!moved) await bump(c); await sleep(200); }
+        else if (n.t === 'spin') { const el = actorEl(c.id); if (el) { el.classList.add('spin'); setTimeout(() => el.classList.remove('spin'), 700); } await sleep(750); }
+        else if (n.t === 'color') { c.hue = ((c.hue || 0) + 90) % 360; const el = actorEl(c.id); if (el) el.style.setProperty('--hue', c.hue + 'deg'); await sleep(450); }
+        else if (n.t === 'flash') { const el = actorEl(c.id); if (el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 900); } await sleep(900); }
+        else if (n.t === 'dance') { const el = actorEl(c.id); if (el) { el.classList.add('dance'); setTimeout(() => el.classList.remove('dance'), 1000); } if (cfg.onDance) cfg.onDance(c); await sleep(1000); }
+        else if (n.t === 'paint') { const k = key(c.x, c.y); st.painted[k] = (c.hue || 0); const cell = root.querySelector(`.cell[data-x="${c.x}"][data-y="${c.y}"]`); if (cell) { cell.classList.add('painted'); cell.style.setProperty('--hue', (c.hue || 0) + 'deg'); } await sleep(350); }
+        else if (n.t === 'plant') { const k = key(c.x, c.y); if (!st.items[k] && !st.rocks[k]) { st.planted[k] = cfg.plantImg || '🌸'; const cell = root.querySelector(`.cell[data-x="${c.x}"][data-y="${c.y}"]`); if (cell) cell.insertAdjacentHTML('beforeend', `<span class="planted">${st.planted[k]}</span>`); } await sleep(350); }
+        else if (n.t === 'drum' || n.t === 'clap' || n.t === 'music') { const txt = { drum: '둥둥!', clap: '짝짝!', music: '🎵' }[n.t]; if (cfg.onSound) cfg.onSound(n.t, c); const el = actorEl(c.id); if (el) { const b = el.querySelector('.bub'); b.textContent = txt; b.classList.remove('off'); setTimeout(() => b.classList.add('off'), n.t === 'music' ? 1400 : 600); el.classList.add('bop'); setTimeout(() => el.classList.remove('bop'), 600); } await sleep(n.t === 'music' ? 1500 : 650); }
+        else if (n.t === 'fast') { st.speed = Math.max(120, Math.round(st.baseSpeed / 2.2)); await sleep(150); }
+        else if (n.t === 'slow') { st.speed = Math.round(st.baseSpeed * 1.8); await sleep(150); }
+        else if (n.t === 'stop') { const el = actorEl(c.id); if (el) { const b = el.querySelector('.bub'); b.textContent = '🛑'; b.classList.remove('off'); setTimeout(() => b.classList.add('off'), 700); } await sleep(400); st.stopped = true; return; }
         else if (n.t === 'forever') { if (depth === 0) { for (let i = 0; i < 12; i++) { if (st.stopped) return; await exec(c, nodes.filter(x => x !== n && !isHat(x.t)), trigger, 1); } } }
         else if (n.t === 'page') { await sleep(300); }
       }
     }
     // 프로그램 실행: trigger = 'flag' | 'tap' | 'recv'. 캐릭터별 프로그램 {id: nodes}
     async function run(programs, trigger) {
-      st.stopped = false; st.running++;
+      st.stopped = false; st.running++; st.speed = st.baseSpeed;
       const jobs = [];
       for (const [id, prog] of Object.entries(programs)) {
         const c = st.chars[id]; if (!c) continue;
@@ -243,9 +255,9 @@ window.BLOCKS = (() => {
     async function runOne(id, programs, trigger) { const p = {}; if (programs[id]) p[id] = programs[id]; return run(p, trigger); }
     function stop() { st.stopped = true; }
     function reset() {
-      st.stopped = true; st.items = {}; st.collected = []; st.executed = {}; st.homed = false;
+      st.stopped = true; st.items = {}; st.collected = []; st.executed = {}; st.homed = false; st.painted = {}; st.planted = {}; st.speed = st.baseSpeed;
       (cfg.map || []).forEach((row, y) => [...row].forEach((ch, x) => { if (/[a-z]/.test(ch)) st.items[key(x, y)] = { id: ch, img: (cfg.legend || {})[ch] || '⭐' }; }));
-      Object.values(st.chars).forEach(c => { c.x = c.sx; c.y = c.sy; c.dir = 'right'; c.size = 1; c.visible = true; c.bubble = ''; });
+      Object.values(st.chars).forEach(c => { c.x = c.sx; c.y = c.sy; c.dir = 'right'; c.size = 1; c.visible = true; c.bubble = ''; c.hue = 0; });
       render();
     }
     st.render = render; st.run = run; st.runOne = runOne; st.stop = stop; st.reset = reset; st.root = root;

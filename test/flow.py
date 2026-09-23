@@ -26,7 +26,7 @@ async def run(name, vw, vh, mobile):
         pg = await ctx.new_page()
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: m.type == 'error' and errs.append(m.text))
         await pg.goto(URL); await pg.wait_for_timeout(500)
-        REQ['CREQ-52 블록 22개·6색'] = await pg.evaluate("Object.keys(CONTENT.blocks).length===22 && new Set(Object.values(CONTENT.blocks).map(b=>b.cat)).size===6")
+        REQ['CREQ-52 블록 35개·6색'] = await pg.evaluate("Object.keys(CONTENT.blocks).length===35 && new Set(Object.values(CONTENT.blocks).map(b=>b.cat)).size===6")
         REQ['CREQ-51 12단원×5일, 1~6단원 미션 2개/일'] = await pg.evaluate("CONTENT.units.length===12 && CONTENT.units.every(u=>u.days.length===5) && CONTENT.units.slice(0,6).every(u=>u.days.every(d=>d.m.length===2))")
         REQ['공통 06 은후 없음·현이/초록이/미소/이모/삼촌'] = await pg.evaluate("!Object.values(CONTENT.friends).some(f=>f.name.includes('은후')) && ['hyun','chorok','miso','imo','samchon'].every(k=>CONTENT.friends[k])")
         await pg.screenshot(path=f'../shots/{name}-1-home.png')
